@@ -49,6 +49,7 @@ class BaseUtility:
 
         except Exception as e:
             logger.error(f"S3 file read failed{e}")
+
     def linux_utility_download_file_from_Linux_server(self):
         try:
             logger.info(f"Downloading file from Linux Server")
@@ -64,6 +65,7 @@ class BaseUtility:
             logger.error(f"Linux file download failed{e}")
 
 
+
 #Inheritance
 class ValidationUtility(BaseUtility):
 
@@ -75,8 +77,6 @@ class ValidationUtility(BaseUtility):
                 self.db_to_db(test_case_name,query_expected,dbconn_expected,query_actual,dbconn_actual)
             elif validation_type == "S3_TO_DB":
                 self.s3_to_db(test_case_name,bucket_name,file_key,query_actual,dbconn_actual)
-
-
 
     def file_to_db(self,test_case_name,file_path,file_type,query_actual,dbconn_actual):
         try:
@@ -171,18 +171,7 @@ class ValidationUtility(BaseUtility):
             logger.error(f"{test_case_name} Validation Failed {e}")
             pytest.fail()
 
-    def linux_utility_download_file_from_linux_server(self):
-        try:
-            logger.info("File download from Linux Server has started...")
-            ssh_client = paramiko.SSHClient()
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(LINUX_HOSTNAME, username=LINUX_USERNAME, password=LINUX_PASSWORD)
-            sftp = ssh_client.open_sftp()
-            sftp.get(REMOTE_FILE_PATH, LOCAL_FILE_PATH)
-            sftp.close()
-            logger.info('File download from Linux Server has completed...')
-        except Exception as e:
-            logger.error(f"Linux file download failed {e}")
+
 
 class FileUtility(BaseUtility):
     def check_file_exists(self, file_path):
@@ -193,12 +182,16 @@ class FileUtility(BaseUtility):
 
     def check_file_size(self, file_path):
         try:
-            return os.path.getsize(file_path)
+            return os.path.getsize(file_path)>0
         except Exception as e:
             logger.error(f"File size check failed {e}")
 
+
+
 # Data Quality Functions
+
 class DataQuality(BaseUtility):
+    # Duplicate Checks
     def check_duplicate_in_file(self,file_path,file_type):
         try:
             df = self.read_file(file_path,file_type)
@@ -206,10 +199,18 @@ class DataQuality(BaseUtility):
                 return False
             return True
         except Exception as e:
-            logger.error(f"Duplicate file check failed {e}")
+            logger.error(f"Duplicate check in file failed {e}")
+            raise
 
     def check_duplicate_in_database(self,query,db_conn):
-        pass
+        try:
+            df = pd.read_sql(query,db_conn)
+            if df.duplicated().any():
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"Duplicate check in DataBase failed {e}")
+            raise
 
     def check_duplicate_for_specific_column_in_file(self,file_path,file_type,column_name):
         try:
@@ -218,10 +219,18 @@ class DataQuality(BaseUtility):
                 return False
             return True
         except Exception as e:
-            logger.error(f"Duplicate file check for column {column_name} failed {e}")
+            logger.error(f"Duplicate check for column i file {column_name} failed {e}")
+            raise
 
-    def check_duplicate_for_specific_column_in_db(self,query,db_conn,column_name):
-        pass
+    def check_duplicate_for_specific_column_in_database(self,query,db_conn,column_name):
+        try:
+            df = pd.read_sql(query,db_conn)
+            if df[column_name].duplicated().any():
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"Duplicate check for column {column_name} failed {e}")
+            raise
 
     # Null Check Functions
 
@@ -233,22 +242,46 @@ class DataQuality(BaseUtility):
             return True
         except Exception as e:
             logger.error(f"Null value check failed {e}")
+            raise
 
-    def check_null_value_for_a_specific_column_in_file(self,file_path,file_type):
-        pass
+    def check_null_value_for_a_specific_column_in_file(self,file_path,file_type,column_name):
+        try:
+            df = self.read_file(file_path,file_type)
+            if df[column_name].isnull().any():
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"Null value check failed {e}")
+            raise
 
     def check_null_value_in_database(self,query,db_conn):
-        pass
+        try:
+            df = pd.read_sql(query,db_conn)
+            if df.isnull().values.any():
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"Null value check failed {e}")
+            raise
 
     def check_null_value_for_a_specific_column_in_database(self,query,db_conn,column_name):
-        pass
+        try:
+            df = pd.read_sql(query, db_conn)
+            if df[column_name].isnull().any():
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"Null value check failed {e}")
+            raise
+
+
 
 class SchemaValidationUtility(BaseUtility):
     def validate_column_names(self,db_conn,table_name,expected_column_names):
         query = f"select * from {table_name}"
         df = pd.read_sql(query,db_conn)
-        actual_column_names = list(df.column)
-        assert actual_column_names == expected_column_names, (
+        actual_column_names = list(df.columns)
+        assert actual_column_names == expected_column_names,(
             f"\n Column mismatch in table {table_name}"
             f"\n expected_columns: {expected_column_names}"
             f"\n actual column names: {actual_column_names}"
@@ -256,15 +289,14 @@ class SchemaValidationUtility(BaseUtility):
     def validate_column_datatypes(self,db_conn,table_name,expected_datatypes_dict):
         query = f"select * from {table_name}"
         df = pd.read_sql(query,db_conn)
-        for column_name, expected_datatype in expected_datatypes.dict.items():
-            actual_datatype = df[column_name].dtypes
-            assert actual_data_type == expected_datatype, (
+        for column_name,expected_datatype in expected_datatypes_dict.items():
+            actual_data_type = df[column_name].dtype
+            assert actual_data_type in expected_datatype, (
                 f"\n Datatype mismatch in table {table_name}"
                 f"\n for mismatch in column: {column_name}"
-                f"\n expected datatype: {expected_datatype}"
-                f"\n actual datatype: {actual_datatype}"
+                f"\n Expected Datatype: {expected_datatype}"
+                f"\n Actual Datatype: {actual_datatype}"
             )
-
 
     def validate_referential_integrity_check(self,primary_db_conn,foreign_db_conn,primary_query,foreign_query,key_column_name,csv_path):
         foreign_df = pd.read_sql(foreign_query,foreign_db_conn)

@@ -12,6 +12,7 @@ class TestDataExtraction:
     validation_utility = ValidationUtility()
     base_utility = BaseUtility()
 
+    @pytest.mark.data_extraction
     #@pytest.mark.skip
     def test_data_extraction_supplier_file_stag(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
@@ -28,6 +29,7 @@ class TestDataExtraction:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_extraction
     #@pytest.mark.skip
     def test_data_extraction_inventory_file_stag(self,connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
@@ -44,6 +46,7 @@ class TestDataExtraction:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_extraction
     #@pytest.mark.skip
     def test_data_extraction_product_file_stag(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
@@ -64,6 +67,7 @@ class TestDataExtraction:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_extraction
     def test_data_extraction_sales_file_stage(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")
@@ -82,6 +86,7 @@ class TestDataExtraction:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_extraction
     #@pytest.mark.skip
     def test_data_extraction_stores_db_stag(self, connect_mysql_database,connect_oracle_database):
         test_case_name = inspect.currentframe().f_code.co_name

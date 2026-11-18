@@ -17,6 +17,7 @@ class TestDataTransformation:
     validation_utility = ValidationUtility()
     base_utility = BaseUtility()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_for_filter_sales_data(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
@@ -36,6 +37,7 @@ class TestDataTransformation:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_for_router_high_sales_data(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
@@ -54,6 +56,7 @@ class TestDataTransformation:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_for_router_low_sales_data(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
@@ -73,6 +76,7 @@ class TestDataTransformation:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_for_aggregator_sales(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
@@ -93,6 +97,7 @@ class TestDataTransformation:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_for_joiner(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
@@ -114,6 +119,7 @@ class TestDataTransformation:
             logger.error(f"TestCase Failed: {e}")
             pytest.fail()
 
+    @pytest.mark.data_transformation
     def test_data_transformation_aggregator_inventory(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Transformation Test {test_case_name}...")
