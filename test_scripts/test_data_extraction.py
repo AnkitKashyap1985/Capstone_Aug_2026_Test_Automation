@@ -13,7 +13,10 @@ class TestDataExtraction:
     base_utility = BaseUtility()
 
     @pytest.mark.data_extraction
+    @pytest.mark.regression
     #@pytest.mark.skip
+    @pytest.mark.order(2)
+    @pytest.mark.smoke
     def test_data_extraction_supplier_file_stag(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")
@@ -30,7 +33,9 @@ class TestDataExtraction:
             pytest.fail()
 
     @pytest.mark.data_extraction
-    #@pytest.mark.skip
+    @pytest.mark.regression
+    @pytest.mark.order(5)
+    @pytest.mark.smoke
     def test_data_extraction_inventory_file_stag(self,connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")
@@ -47,7 +52,9 @@ class TestDataExtraction:
             pytest.fail()
 
     @pytest.mark.data_extraction
-    #@pytest.mark.skip
+    @pytest.mark.regression
+    @pytest.mark.order(3)
+    @pytest.mark.smoke
     def test_data_extraction_product_file_stag(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")
@@ -68,6 +75,8 @@ class TestDataExtraction:
             pytest.fail()
 
     @pytest.mark.data_extraction
+    @pytest.mark.smoke
+    @pytest.mark.order(1)
     def test_data_extraction_sales_file_stage(self, connect_mysql_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")
@@ -87,7 +96,9 @@ class TestDataExtraction:
             pytest.fail()
 
     @pytest.mark.data_extraction
-    #@pytest.mark.skip
+    @pytest.mark.regression
+    @pytest.mark.smoke
+    @pytest.mark.order(4)
     def test_data_extraction_stores_db_stag(self, connect_mysql_database,connect_oracle_database):
         test_case_name = inspect.currentframe().f_code.co_name
         logger.info(f"Starting Data Extraction Test {test_case_name}...")

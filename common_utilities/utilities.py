@@ -304,7 +304,6 @@ class SchemaValidationUtility(BaseUtility):
         df_not_matched = foreign_df[~foreign_df[key_column_name].isin(primary_df[key_column_name])]
         if not df_not_matched.empty:
             df_not_matched.to_csv(csv_path,index=False)
-
         return df_not_matched
 
 
